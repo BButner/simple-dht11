@@ -4,6 +4,10 @@ description = "A simple library to get a reading from a DHT11."
 name = "simple-dht11"
 version = "0.1.0"
 edition = "2021"
+homepage = "https://github.com/bbutner/simple-dht11"
+repository = "https://github.com/bbutner/simple-dht11"
+readme = "README.md"
+license-file = "LICENSE"
 include = [
     "src/**/*.rs",
     "examples/**/*",
