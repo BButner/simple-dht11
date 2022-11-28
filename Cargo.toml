@@ -7,7 +7,7 @@ edition = "2021"
 homepage = "https://github.com/bbutner/simple-dht11"
 repository = "https://github.com/bbutner/simple-dht11"
 readme = "README.md"
-license-file = "LICENSE"
+license = "GPL-3.0"
 include = [
     "src/**/*.rs",
     "examples/**/*",
