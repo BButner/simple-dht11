@@ -8,8 +8,18 @@ pub struct Dht11 {
 
     // The IoPin used for communication with the DHT11
     pin: Option<IoPin>,
+
+    // The last accepted temperature reading
+    last_temperature: f32,
+
+    // The last accepted humidity reading
+    last_humidity: f32,
+
+    // The threshold for the values to be accepted
+    invalid_threshold: f32,
 }
 
+#[derive(Clone, Copy)]
 pub struct Dht11Reading {
     // The temperature in degrees Celsius
     pub temperature: f32,
@@ -24,6 +34,9 @@ impl Dht11 {
         let mut dht11 = Dht11 {
             pin_number,
             pin: None,
+            last_temperature: 0.0,
+            last_humidity: 0.0,
+            invalid_threshold: 0.1,
         };
 
         dht11.init_pin();
@@ -33,16 +46,50 @@ impl Dht11 {
 
     // Attempt to get a reading from the DHT11.
     pub fn get_reading(&mut self) -> Dht11Reading {
+        let mut bad_temp_count: u8 = 0;
+        let mut bad_humidity_count: u8 = 0;
+        let mut is_valid: bool = false;
+
         let mut reading = self.read_data();
 
-        while reading.is_none() {
-            // Sleep for 500ms and try again
-            sleep(Duration::from_millis(500));
+        while !is_valid {
+            while reading.is_none() {
+                // Sleep for 500ms and try again
+                sleep(Duration::from_millis(500));
 
-            reading = self.read_data();
+                reading = self.read_data();
+            }
+
+            let reading = reading.unwrap();
+
+            let absolute_temp = (reading.temperature - self.last_temperature).abs();
+            let absolute_humidity = (reading.humidity - self.last_humidity).abs();
+
+            if absolute_temp / self.last_temperature > self.invalid_threshold {
+                bad_temp_count += 1;
+                is_valid = false;
+            } else {
+                is_valid = true;
+            }
+
+            if absolute_humidity / self.last_humidity > self.invalid_threshold {
+                bad_humidity_count += 1;
+                is_valid = false;
+            } else {
+                is_valid = true;
+            }
+
+            if bad_temp_count > 5 || bad_humidity_count > 5 {
+                is_valid = true;
+            }
         }
 
-        reading.unwrap()
+        let reading = reading.unwrap();
+
+        self.last_temperature = reading.temperature;
+        self.last_humidity = reading.humidity;
+
+        reading
     }
 
     // Initialize the pin

@@ -2,7 +2,7 @@
 authors = ["BButner"]
 description = "A simple library to get a reading from a DHT11 hooked up to a Raspberry Pi."
 name = "simple-dht11"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 homepage = "https://github.com/bbutner/simple-dht11"
 repository = "https://github.com/bbutner/simple-dht11"
